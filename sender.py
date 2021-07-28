@@ -1,4 +1,7 @@
 from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as ec
+from selenium.webdriver.support.wait import WebDriverWait
 
 
 class Sender:
@@ -16,17 +19,36 @@ class Sender:
         # завершаем авторизацию
         self.__driver.find_element_by_xpath("//span[contains(text(),'Вход')]").click()
 
-    def get_list_events(self)->list[tuple]:
+    def get_list_events(self):
         """
-        выход:
-        list(tuples)
-        tuples:
-        1 элемент - название матча
-        2 элемент - ссылка на матч
         функция для получения спискаматчей
         :return:
         """
         pass
+
+    def filter_events(self, events: list[tuple]) -> list[tuple]:
+        """
+        Функция для фильтрации матчей, отбирает только те матчи,
+         в которых можно поставить на иннинг
+         :param events: Список матчей
+         :return: Список отфильтрованных матчей
+        """
+        filtered_events = []
+        for event in events:
+            self.__driver.get(event[1])
+            try:
+                # ожидание полной загрузки страницы, максимально ждем 5 секунд
+                element = WebDriverWait(self.__driver, 5).until(
+                    ec.presence_of_element_located((
+                        By.XPATH,
+                        "//div[contains(text(), 'Победа в матче')]"
+                    ))
+                )
+                self.__driver.find_element_by_xpath("//div[contains(text(), 'Кто выиграет иннинг N')]")
+                filtered_events.append(event)
+            except Exception:
+                continue
+        return filtered_events
 
     def close(self):
         self.__driver.close()
