@@ -19,12 +19,20 @@ class Sender:
         # завершаем авторизацию
         self.__driver.find_element_by_xpath("//span[contains(text(),'Вход')]").click()
 
-    def get_list_events(self):
+    def get_list_events(self) -> list[tuple]:
         """
-        функция для получения спискаматчей
-        :return:
+        функция для получения списка матчей
+        return: list(tuple(arg1:str, arg2:str))
+        arg1 - имя_матча
+        arg2 - ссылка_на_матч
         """
-        pass
+        events = []
+        elements = self.__driver.find_elements_by_class_name("sport-base-event__main--Zg9I0")
+        for elem in elements:
+            elem = elem.find_element_by_tag_name('a')
+            name, href = elem.text, elem.get_attribute('href')
+            events.append((name, href))
+        return events
 
     def filter_events(self, events: list[tuple]) -> list[tuple]:
         """
