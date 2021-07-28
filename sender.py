@@ -16,8 +16,13 @@ class Sender:
         # завершаем авторизацию
         self.__driver.find_element_by_xpath("//span[contains(text(),'Вход')]").click()
 
-    def get_list_events(self):
+    def get_list_events(self)->list[tuple]:
         """
+        выход:
+        list(tuples)
+        tuples:
+        1 элемент - название матча
+        2 элемент - ссылка на матч
         функция для получения спискаматчей
         :return:
         """
