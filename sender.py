@@ -48,7 +48,7 @@ class Sender:
             except:
                 continue
             inning_group = group
-        if not inning_group: pass
+        if not inning_group: return -1
         buttons = inning_group.find_elements_by_xpath(".//div[starts-with(@class, 'row-common--')]")
         buttons[0].find_elements_by_xpath(".//div[starts-with(@class, 'cell-wrap')]")[-1].click()
         input_sum = self.__driver.find_element_by_xpath("//input[starts-with(@class, 'sum-panel__input--')]").clear()
@@ -57,7 +57,7 @@ class Sender:
             self.__driver.find_element_by_xpath("//div[starts-with(@class, 'place-button__inner--')]").click()
         except:
             print('Поставить не удалось')
-            pass
+            return -1
         self.__driver.find_element_by_xpath("//span[starts-with(text(), 'История')]").click()
         id_ = self.__driver.find_element_by_xpath("//div[starts-with(@class, 'caption--')]").text.split()[1]
         return id_
