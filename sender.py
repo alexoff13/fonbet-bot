@@ -33,7 +33,13 @@ class Sender:
         :param quantity: размер_ставки (str)
         :return: id ставки (int)
         """
-        WebDriverWait(self.__driver, 10).until(self.__driver.get(href))
+        self.__driver.get(href)
+        WebDriverWait(self.__driver, 10).until(
+            ec.presence_of_element_located((
+                By.XPATH,
+                "//div[starts-with(@class, 'market-group-box')]"
+            ))
+        )
         groups = self.__driver.find_elements_by_xpath("//div[starts-with(@class, 'market-group-box')]")
         inning_group = None
         for group in groups:
