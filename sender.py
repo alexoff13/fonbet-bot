@@ -27,6 +27,28 @@ class Sender:
         # завершаем авторизацию
         self.__driver.find_element_by_xpath("//span[contains(text(),'Вход')]").click()
 
+    def bet(self, href: str, quantity: int) -> int:
+        """
+        :param href: ссылка_на_матч (str)
+        :param quantity: размер_ставки (str)
+        :return: id ставки
+        """
+        element = WebDriverWait(self.__driver, 10).until(self.__driver.get(href))
+        buttons = element.find_elements_by_xpath(".//div[starts-with(@class, 'row-common--')]")
+        buttons[0].find_elements_by_xpath(".//div[starts-with(@class, 'cell-wrap')]")[-1].click()
+        input_sum = self.__driver.find_element_by_xpath("//input[starts-with(@class, 'sum-panel__input--')]")
+        input_sum.clear()
+        input_sum.send_keys(str(quantity))
+        try:
+            self.__driver.find_element_by_xpath("//div[starts-with(@class, 'place-button__inner--')]").click()
+        except:
+            print('Поставить не удалось')
+            pass
+        self.__driver.find_element_by_xpath("//span[starts-with(text(), 'История')]").click()
+        id_ = self.__driver.find_element_by_xpath("//div[starts-with(@class, 'caption--')]").text.split()[1]
+        return id_
+
+
     def get_list_events(self) -> list[tuple]:
         """
         функция для получения списка матчей
