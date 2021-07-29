@@ -1,8 +1,9 @@
+from datetime import datetime, timedelta
+
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.support.wait import WebDriverWait
-from datetime import datetime, timedelta
 
 
 class Sender:
@@ -45,11 +46,14 @@ class Sender:
             elem1 = elem.find_element_by_tag_name('a')
             name, href = elem1.text, elem1.get_attribute('href')
             try:
-                time = elem.find_element_by_xpath("//span[starts-with(@class, 'event-block-planned-time__time')]").text
-                today = str(datetime.today().date() + timedelta(days=1))
-                time = time.split(' ')[2]
-                today += ' ' + time
-                events.append((name, href, datetime.strptime(today, "%Y-%m-%d %H:%M")))
+                time = elem.find_element_by_xpath(".//span[starts-with(@class, 'event-block-planned-time__time')]").text
+                time_parts = time.split(' ')
+                if time_parts[0] == 'Завтра':
+                    day = str(datetime.today().date() + timedelta(days=1))
+                elif time_parts[0] == 'Сегодня':
+                    day = str(datetime.today().date())
+                event_time = day + ' ' + time_parts[2]
+                events.append((name, href, datetime.strptime(event_time, "%Y-%m-%d %H:%M")))
             except:
                 continue
         return events
@@ -104,17 +108,16 @@ class Sender:
             # и нас они не интересуют
             # возможно стоит запоминать время первой ставки из таблицы и сохранять,
             # чтобы при последующем просмотре истории не просматривать старые матчи
-            # цикл в цикле гребанный костыль, по другому пока хз как
             if i != 1:
                 try:
                     bet.find_element_by_class_name('column column-1 _hasDate')
                     break
                 except:
                     pass
-            time = bet.find_elements_by_xpath("//div[contains(@class, 'column column-2')]")[i].text
-            id_ = bet.find_elements_by_xpath("//div[contains(@class, 'column column-3')]")[i].text
-            sum_ = bet.find_elements_by_xpath("//div[contains(@class, 'column column-5')]")[i].text
-            res = bet.find_elements_by_xpath("//div[contains(@class, 'column column-6')]")[i].text
+            time = bet.find_element_by_xpath(".//div[contains(@class, 'column column-2')]").text
+            id_ = bet.find_element_by_xpath(".//div[contains(@class, 'column column-3')]").text
+            sum_ = bet.find_element_by_xpath(".//div[contains(@class, 'column column-5')]").text
+            res = bet.find_element_by_xpath(".//div[contains(@class, 'column column-6')]").text
             history_results.append({
                 'time': time,
                 'id': id_,
