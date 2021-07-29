@@ -33,13 +33,17 @@ class Sender:
         :param quantity: размер_ставки (str)
         :return: id ставки (int)
         """
-        element = WebDriverWait(self.__driver, 10).until(self.__driver.get(href))
-        try:
-            element = element.find_element_by_xpath(".//div[contains(text(), 'Кто выиграет иннинг N')]")
-        except:
-            print('Иннингов нет')
-            pass
-        buttons = element.find_elements_by_xpath(".//div[starts-with(@class, 'row-common--')]")
+        WebDriverWait(self.__driver, 10).until(self.__driver.get(href))
+        groups = self.__driver.find_elements_by_xpath("//div[starts-with(@class, 'market-group-box')]")
+        inning_group = None
+        for group in groups:
+            try:
+                group.find_element_by_xpath(".//div[contains(text(), 'Кто выиграет иннинг N')]")
+            except:
+                continue
+            inning_group = group
+        if not inning_group: pass
+        buttons = inning_group.find_elements_by_xpath(".//div[starts-with(@class, 'row-common--')]")
         buttons[0].find_elements_by_xpath(".//div[starts-with(@class, 'cell-wrap')]")[-1].click()
         input_sum = self.__driver.find_element_by_xpath("//input[starts-with(@class, 'sum-panel__input--')]").clear()
         input_sum.send_keys(str(quantity))
