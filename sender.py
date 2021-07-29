@@ -2,14 +2,15 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.support.wait import WebDriverWait
+from datetime import datetime, timedelta
 
 
 class Sender:
     def __init__(self, login: str, password: str):
         self.__driver = webdriver.Chrome('chromedriver')
-        self.__driver.get("https://www.fonbet.ru/")
+        self.__driver.get("https://www.fonbet.ru/sports/baseball")
         # переходим на страницу авторизации
-        element = WebDriverWait(self.__driver, 5).until(
+        element = WebDriverWait(self.__driver, 7).until(
             ec.presence_of_element_located((
                 By.XPATH,
                 "//a[contains(text(), 'Вход')]"
@@ -33,11 +34,24 @@ class Sender:
         arg2 - ссылка_на_матч
         """
         events = []
-        elements = self.__driver.find_elements_by_class_name("sport-base-event__main--Zg9I0")
+        element = WebDriverWait(self.__driver, 10).until(
+            ec.presence_of_element_located((
+                By.XPATH,
+                "//div[starts-with(@class,'sport-base-event__main--')]"
+            ))
+        )
+        elements = self.__driver.find_elements_by_xpath("//div[starts-with(@class,'sport-base-event__main--')]")
         for elem in elements:
-            elem = elem.find_element_by_tag_name('a')
-            name, href = elem.text, elem.get_attribute('href')
-            events.append((name, href))
+            elem1 = elem.find_element_by_tag_name('a')
+            name, href = elem1.text, elem1.get_attribute('href')
+            try:
+                time = elem.find_element_by_xpath("//span[starts-with(@class, 'event-block-planned-time__time')]").text
+                today = str(datetime.today().date() + timedelta(days=1))
+                time = time.split(' ')[2]
+                today += ' ' + time
+                events.append((name, href, datetime.strptime(today, "%Y-%m-%d %H:%M")))
+            except:
+                continue
         return events
 
     def filter_events(self, events: list[tuple]) -> list[tuple]:
