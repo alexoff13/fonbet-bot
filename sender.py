@@ -1,5 +1,4 @@
 from datetime import datetime, timedelta
-
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as ec
@@ -51,6 +50,12 @@ class Sender:
         if not inning_group: return -1
         buttons = inning_group.find_elements_by_xpath(".//div[starts-with(@class, 'row-common--')]")
         buttons[0].find_elements_by_xpath(".//div[starts-with(@class, 'cell-wrap')]")[-1].click()
+        WebDriverWait(self.__driver, 3).until(
+            ec.presence_of_element_located((
+                By.XPATH,
+                "//input[starts-with(@class, 'sum-panel__input--')]"
+            ))
+        )
         input_sum = self.__driver.find_element_by_xpath("//input[starts-with(@class, 'sum-panel__input--')]").clear()
         input_sum.send_keys(str(quantity))
         try:
